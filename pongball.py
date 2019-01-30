@@ -60,8 +60,8 @@ class Ball:
         elif self.right_end >= SCREEN_WIDTH or self.left_end <= 0:
             self.x = SCREEN_WIDTH // 2
             self.y = SCREEN_HEIGHT // 2
-            self.y_change = random.choice((-1, 1, 3, -3, 2, -2))
-            self.x_change = random.choice((-4, 4))
+            self.y_change = random.choice((-1, 1, -4, 4, -6, 6))
+            self.x_change = random.choice((-10, 10))
 
         self.x += self.x_change
         self.y += self.y_change
@@ -75,7 +75,7 @@ class Ball:
 pygame.init()
 
 # Setting Frame Rate of game
-FPS = 120
+FPS = 30
 fpsClock = pygame.time.Clock()
 
 # Setting screen dimensions
@@ -87,11 +87,11 @@ BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 
 # Defining change in y coordinate of paddles due to single key press
-paddle_ychange = 8
+paddle_ychange = 20
 
 # Defining change in coordinates of ball over time
-ball_xchange = 4
-ball_ychange = 4
+ball_xchange = 10
+ball_ychange = 10
 
 # Creating pygame surface
 displaysurf = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
