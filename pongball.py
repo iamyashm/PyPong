@@ -42,6 +42,7 @@ class Ball:
         self.upper_end = self.y - self.radius
         self.x_change = x_change
         self.y_change = y_change
+        self.isHit = False
 
     def drawBall(self):
         pygame.draw.circle(self.surface, self.color, self.centre, self.radius)
@@ -51,17 +52,28 @@ class Ball:
         if self.upper_end <= 0 or self.lower_end >= SCREEN_HEIGHT:
             self.y_change *= -1
 
-        if self.upper_end >= paddle1_pos[1] and self.lower_end <= paddle1_pos[1] + paddle1_pos[3] and self.left_end <= paddle1_pos[0] + paddle1_pos[2] and self.right_end > paddle1_pos[0] + paddle1_pos[2]:
+        if self.upper_end >= paddle1_pos[1] and self.lower_end <= paddle1_pos[1] + paddle1_pos[3] and self.left_end <= paddle1_pos[0] + paddle1_pos[2] and self.right_end > paddle1_pos[0] + paddle1_pos[2] and not self.isHit:
             self.x_change *= -1
+            self.isHit = True
 
-        elif self.upper_end >= paddle2_pos[1] and self.lower_end <= paddle2_pos[1] + paddle2_pos[3] and self.right_end >= paddle2_pos[0] and self.left_end < paddle2_pos[0]:
+        elif self.upper_end >= paddle2_pos[1] and self.lower_end <= paddle2_pos[1] + paddle2_pos[3] and self.right_end >= paddle2_pos[0] and self.left_end < paddle2_pos[0] and not self.isHit:
             self.x_change *= -1
+            self.isHit = True
 
         elif self.right_end >= SCREEN_WIDTH or self.left_end <= 0:
+            global score1
+            global score2
+            if self.right_end >= SCREEN_WIDTH:
+                score1 += 1
+            else:
+                score2 += 1
             self.x = SCREEN_WIDTH // 2
             self.y = SCREEN_HEIGHT // 2
-            self.y_change = random.choice((-1, 1, -4, 4, -6, 6))
+            self.y_change = random.choice((-1, 1, 3, -3, 6, -6))
             self.x_change = random.choice((-10, 10))
+
+        else:
+            self.isHit = False
 
         self.x += self.x_change
         self.y += self.y_change
@@ -72,10 +84,22 @@ class Ball:
         self.upper_end = self.y - self.radius
 
 
+def displayScore(displaysurf, value1, value2):
+    fontObj = pygame.font.Font('freesansbold.ttf', 100)
+    textSurfaceObj1 = fontObj.render(str(value1), True, WHITE, BLACK)
+    textSurfaceObj2 = fontObj.render(str(value2), True, WHITE, BLACK)
+    textRectObj1 = textSurfaceObj1.get_rect()
+    textRectObj1.center = (300, 70)
+    textRectObj2 = textSurfaceObj2.get_rect()
+    textRectObj2.center = (500, 70)
+    displaysurf.blit(textSurfaceObj1, textRectObj1)
+    displaysurf.blit(textSurfaceObj2, textRectObj2)
+
+
 pygame.init()
 
 # Setting Frame Rate of game
-FPS = 30
+FPS = 40
 fpsClock = pygame.time.Clock()
 
 # Setting screen dimensions
@@ -99,8 +123,8 @@ pygame.display.set_caption('Pong!')
 running = True
 
 # Setting initial positions of both rectangular paddles
-paddle1_pos = (20, 250, 15, 100)
-paddle2_pos = (765, 250, 15, 100)
+paddle1_pos = (0, 250, 10, 100)
+paddle2_pos = (790, 250, 10, 100)
 
 # Creating two paddle objects
 paddle1 = Paddle(WHITE, paddle1_pos, paddle_ychange, displaysurf)
@@ -114,12 +138,15 @@ paddle2.drawPaddle()
 ball_centre = (SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)
 ball_radius = 6
 
+
 # Creating ball object
 ball = Ball(displaysurf, WHITE, ball_centre, ball_radius, ball_xchange, ball_ychange)
 
 # Drawing ball
 ball.drawBall()
 
+score1 = 0
+score2 = 0
 
 # Game loop
 while running:
@@ -144,6 +171,10 @@ while running:
     paddle1.drawPaddle()
     paddle2.drawPaddle()
 
+    displayScore(displaysurf, score1, score2)
+
+    for i in range(-5, 601, 40):
+        pygame.draw.rect(displaysurf, WHITE, (395, i, 10, 10))
     ball.update(paddle1_pos, paddle2_pos)
     ball.drawBall()
 
