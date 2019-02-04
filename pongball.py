@@ -69,7 +69,7 @@ class Ball:
                 score2 += 1
             self.x = SCREEN_WIDTH // 2
             self.y = SCREEN_HEIGHT // 2
-            self.y_change = random.choice((-1, 1, 3, -3, 6, -6))
+            self.y_change = random.choice((-1, 1, 3, -3, 4, -4, 6, -6))
             self.x_change = random.choice((-10, 10))
 
         else:
@@ -85,7 +85,7 @@ class Ball:
 
 
 def displayScore(displaysurf, value1, value2):
-    fontObj = pygame.font.Font('freesansbold.ttf', 100)
+    fontObj = pygame.font.SysFont('ubuntu', 100)
     textSurfaceObj1 = fontObj.render(str(value1), True, WHITE, BLACK)
     textSurfaceObj2 = fontObj.render(str(value2), True, WHITE, BLACK)
     textRectObj1 = textSurfaceObj1.get_rect()
@@ -94,6 +94,58 @@ def displayScore(displaysurf, value1, value2):
     textRectObj2.center = (500, 70)
     displaysurf.blit(textSurfaceObj1, textRectObj1)
     displaysurf.blit(textSurfaceObj2, textRectObj2)
+
+
+def startScreen(displaysurf):
+    displaysurf.fill(BLACK)
+    fontObj1 = pygame.font.SysFont('ubuntu', 170)
+    textSurfaceObj1 = fontObj1.render('PyPong', True, WHITE, BLACK)
+    textRectObj1 = textSurfaceObj1.get_rect()
+    textRectObj1.center = (400, 270)
+    displaysurf.blit(textSurfaceObj1, textRectObj1)
+    fontObj2 = pygame.font.SysFont('ubuntu', 40)
+    textSurfaceObj2 = fontObj2.render('Press Space to Start', True, WHITE, BLACK)
+    textRectObj2 = textSurfaceObj2.get_rect()
+    textRectObj2.center = (400, 450)
+    displaysurf.blit(textSurfaceObj2, textRectObj2)
+    pygame.display.update()
+    intro = True
+    while intro:
+        for event in pygame.event.get():
+            if event.type == KEYDOWN:
+                if event.key == K_ESCAPE:
+                    intro = False
+                    pygame.quit()
+                    sys.exit()
+                elif event.key == K_SPACE:
+                    intro = False
+            elif event.type == QUIT:
+                pygame.quit()
+                sys.exit()
+
+
+def winScreen(displaysurf, winner):
+    displaysurf.fill(BLACK)
+    fontObj1 = pygame.font.SysFont('ubuntu', 100)
+    textSurfaceObj1 = fontObj1.render('GAME OVER', True, WHITE, BLACK)
+    textRectObj1 = textSurfaceObj1.get_rect()
+    textRectObj1.center = (400, 270)
+    displaysurf.blit(textSurfaceObj1, textRectObj1)
+    fontObj2 = pygame.font.SysFont('ubuntu', 40)
+    textSurfaceObj2 = fontObj2.render('PLAYER %d WINS!' % (winner), True, WHITE, BLACK)
+    textRectObj2 = textSurfaceObj2.get_rect()
+    textRectObj2.center = (400, 450)
+    displaysurf.blit(textSurfaceObj2, textRectObj2)
+    pygame.display.update()
+    while True:
+        for event in pygame.event.get():
+            if event.type == KEYDOWN:
+                if event.key == K_ESCAPE:
+                    pygame.quit()
+                    sys.exit()
+            elif event.type == QUIT:
+                pygame.quit()
+                sys.exit()
 
 
 pygame.init()
@@ -122,9 +174,13 @@ displaysurf = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption('Pong!')
 running = True
 
+startScreen(displaysurf)
+
+displaysurf.fill(BLACK)
+
 # Setting initial positions of both rectangular paddles
-paddle1_pos = (0, 250, 10, 100)
-paddle2_pos = (790, 250, 10, 100)
+paddle1_pos = (0, 250, 10, 80)
+paddle2_pos = (790, 250, 10, 80)
 
 # Creating two paddle objects
 paddle1 = Paddle(WHITE, paddle1_pos, paddle_ychange, displaysurf)
@@ -147,6 +203,7 @@ ball.drawBall()
 
 score1 = 0
 score2 = 0
+
 
 # Game loop
 while running:
@@ -172,6 +229,11 @@ while running:
     paddle2.drawPaddle()
 
     displayScore(displaysurf, score1, score2)
+
+    if score1 == 5:
+        winScreen(displaysurf, 1)
+    elif score2 == 5:
+        winScreen(displaysurf, 2)
 
     for i in range(-5, 601, 40):
         pygame.draw.rect(displaysurf, WHITE, (395, i, 10, 10))
